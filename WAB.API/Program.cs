@@ -13,6 +13,7 @@ builder.Services.AddDbContext<WabContext>(option =>
 {
     option.EnableSensitiveDataLogging();
     option.UseNpgsql(builder.Configuration.GetConnectionString("WalletDB"));
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 });
 
 

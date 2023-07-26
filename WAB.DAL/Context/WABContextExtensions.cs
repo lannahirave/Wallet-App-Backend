@@ -11,7 +11,6 @@ public static class WabContextExtensions
         modelBuilder.Entity<User>(
             entity =>
             {
-                entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id)
                     .UseIdentityColumn();
 
@@ -36,7 +35,6 @@ public static class WabContextExtensions
         modelBuilder.Entity<Transaction>(
             entity =>
             {
-                entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id)
                     .UseIdentityColumn();
 
@@ -73,58 +71,46 @@ public static class WabContextExtensions
                     .WithMany(u => u.AuthorizedTransactions)
                     .HasForeignKey(e => e.AuthorizedUserId)
                     .OnDelete(DeleteBehavior.Restrict);
-
-                // Add other properties of the Transaction entity if available.
             }
         );
     }
 
     public static void SeedData(this ModelBuilder modelBuilder)
     {
-        var users = GenerateRandomUser();
-        var transactions = users.SelectMany(u => u.Transactions).ToList();
+        // Create a Faker instance for generating fake data
+        var faker = new Faker();
 
-        modelBuilder.Entity<User>().HasData(users);
-        modelBuilder.Entity<Transaction>().HasData(transactions);
-    }
-
-    private static ICollection<User> GenerateRandomUser(DbContext dbContext, int numberOfUsers = 10)
-    {
-        var userId = 1;
-        var usersFake = new Faker<User>()
-            .RuleFor(u => u.Id, f => userId++)
-            .RuleFor(u => u.CardBalance, f => f.Finance.Amount(0, 1500))
-            .RuleFor(u => u.DailyPoints, f => 0)
+        // Generate random users
+        var users = new Faker<User>()
+            .RuleFor(u => u.Id, f => f.IndexFaker - 1000) // Use negative values for User Ids
+            .RuleFor(u => u.CardBalance, f => f.Random.Decimal(0, 1500))
+            .RuleFor(u => u.DailyPoints, f => f.Random.Decimal(0, 100))
             .RuleFor(u => u.LastDailyPoints, f => f.Date.Past())
-            .RuleFor(u => u.Transactions,
-                f => GenerateRandomTransactions(dbContext,
-                    f.Random.Int(5, 15))); // Generate 5 to 15 transactions per user.
+            .Generate(10);
 
-        return usersFake.Generate(numberOfUsers); // Generate the specified number of random users.
-    }
+        // Add the generated users to the DbContext
+        modelBuilder.Entity<User>().HasData(users);
 
-    private static ICollection<Transaction> GenerateRandomTransactions(DbContext dbContext,
-        int numberOfTransactions = 10)
-    {
-        var transactionsFake = new Faker<Transaction>()
+        // Generate random transactions
+        var transactions = new Faker<Transaction>()
+            .RuleFor(t => t.Id, f => f.IndexFaker - 2000) // Use negative values for Transaction Ids
             .RuleFor(t => t.Type, f => f.PickRandom<TransactionType>())
-            .RuleFor(t => t.Amount, f => f.Finance.Amount(0, 1500))
-            .RuleFor(t => t.Name, f => f.Finance.AccountName())
-            .RuleFor(t => t.Description, f => f.Lorem.Sentence())
-            .RuleFor(t => t.Date, f => f.Date.Past())
+            .RuleFor(t => t.Amount, f => f.Finance.Amount(10, 500))
+            .RuleFor(t => t.Name, f => f.Commerce.ProductName())
+            .RuleFor(t => t.Description, f => f.Lorem.Sentence(5))
+            .RuleFor(t => t.Date, f => f.Date.Past().ToUniversalTime()) // Convert to UTC
             .RuleFor(t => t.Pending, f => f.Random.Bool())
             .RuleFor(t => t.Icon, f => f.Image.PicsumUrl())
-            .RuleFor(t => t.UserId, f => f.Random.Int(1, 10))
-            .RuleFor(t => t.AuthorizedUserId, f => f.Random.Bool() ? f.Random.Int(0, 10) : (int?) null);
+            .RuleFor(t => t.UserId, f => f.PickRandom(users).Id) // Assign random UserId to each transaction
+            .Generate(20);
+        // Assign random AuthorizedUserId to 30% of the transactions
+        foreach (var transaction in transactions)
+        {
+            var hasAuthorizedUser = faker.Random.Bool((float) 0.3);
+            if (hasAuthorizedUser) transaction.AuthorizedUserId = users[faker.Random.Int(0, users.Count - 1)].Id;
+        }
 
-        var transactions = transactionsFake.Generate(numberOfTransactions);
-
-        // Assign unique positive Id values for seed data
-        var currentMaxId = dbContext.Set<Transaction>().Max(t => (int?) t.Id) ?? 0;
-        var nextId = Math.Max(1, currentMaxId + 1);
-
-        foreach (var transaction in transactions) transaction.Id = nextId++;
-
-        return transactions;
+        // Add the generated transactions to the DbContext
+        modelBuilder.Entity<Transaction>().HasData(transactions);
     }
 }

@@ -5,7 +5,7 @@ public class Transaction
 {
     // Constructor
     public Transaction(decimal amount, string name, string description, DateTime date, bool pending, string icon,
-        User authorizedUser, User user)
+        User authorizedUser, User? user)
     {
         Type = amount > 0 ? TransactionType.Payment : TransactionType.Credit;
         Amount = amount;
