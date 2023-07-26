@@ -14,6 +14,12 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public async Task<IEnumerable<User>> GetAll()
+    {
+        return await _context.Users
+            .Include(u => u.Transactions).ToListAsync();
+    }
+
     public async Task<User?> Get(int id)
     {
         return await _context.Users

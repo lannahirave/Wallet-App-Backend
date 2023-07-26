@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WAB.API.Extensions;
 using WAB.DAL.Context;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddDbContext<WabContext>(option =>
     AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 });
 
+builder.Services.RegisterCustomServices();
+builder.Services.RegisterAutoMapper();
 
 var app = builder.Build();
 
@@ -25,6 +28,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.RegisterMiddlewares();
 
 app.UseHttpsRedirection();
 
