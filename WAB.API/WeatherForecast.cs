@@ -1,4 +1,4 @@
-namespace WalletAppBackend.API;
+namespace WAB.API;
 
 public class WeatherForecast
 {

@@ -20,6 +20,11 @@ public class Transaction
         AuthorizedUserId = authorizedUser.Id;
     }
 
+    public Transaction()
+    {
+        // You can initialize properties with default values here if needed.
+    }
+
     public int Id { get; set; }
     public TransactionType Type { get; set; }
     public decimal Amount { get; set; }
@@ -32,7 +37,7 @@ public class Transaction
 
     public User User { get; set; }
 
-    public int AuthorizedUserId { get; set; }
-    public User AuthorizedUser { get; set; }
+    public int? AuthorizedUserId { get; set; }
+    public User? AuthorizedUser { get; set; }
     public string Icon { get; set; } // Icon property to store the icon path or icon class reference
 }

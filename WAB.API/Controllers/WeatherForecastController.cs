@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace WalletAppBackend.API.Controllers;
+namespace WAB.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]

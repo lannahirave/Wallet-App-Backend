@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Bogus;
+using Microsoft.EntityFrameworkCore;
 using WAB.DAL.Entities;
 
 namespace WAB.DAL.Context;
@@ -69,12 +70,61 @@ public static class WabContextExtensions
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.AuthorizedUser)
-                    .WithMany()
+                    .WithMany(u => u.AuthorizedTransactions)
                     .HasForeignKey(e => e.AuthorizedUserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 // Add other properties of the Transaction entity if available.
             }
         );
+    }
+
+    public static void SeedData(this ModelBuilder modelBuilder)
+    {
+        var users = GenerateRandomUser();
+        var transactions = users.SelectMany(u => u.Transactions).ToList();
+
+        modelBuilder.Entity<User>().HasData(users);
+        modelBuilder.Entity<Transaction>().HasData(transactions);
+    }
+
+    private static ICollection<User> GenerateRandomUser(DbContext dbContext, int numberOfUsers = 10)
+    {
+        var userId = 1;
+        var usersFake = new Faker<User>()
+            .RuleFor(u => u.Id, f => userId++)
+            .RuleFor(u => u.CardBalance, f => f.Finance.Amount(0, 1500))
+            .RuleFor(u => u.DailyPoints, f => 0)
+            .RuleFor(u => u.LastDailyPoints, f => f.Date.Past())
+            .RuleFor(u => u.Transactions,
+                f => GenerateRandomTransactions(dbContext,
+                    f.Random.Int(5, 15))); // Generate 5 to 15 transactions per user.
+
+        return usersFake.Generate(numberOfUsers); // Generate the specified number of random users.
+    }
+
+    private static ICollection<Transaction> GenerateRandomTransactions(DbContext dbContext,
+        int numberOfTransactions = 10)
+    {
+        var transactionsFake = new Faker<Transaction>()
+            .RuleFor(t => t.Type, f => f.PickRandom<TransactionType>())
+            .RuleFor(t => t.Amount, f => f.Finance.Amount(0, 1500))
+            .RuleFor(t => t.Name, f => f.Finance.AccountName())
+            .RuleFor(t => t.Description, f => f.Lorem.Sentence())
+            .RuleFor(t => t.Date, f => f.Date.Past())
+            .RuleFor(t => t.Pending, f => f.Random.Bool())
+            .RuleFor(t => t.Icon, f => f.Image.PicsumUrl())
+            .RuleFor(t => t.UserId, f => f.Random.Int(1, 10))
+            .RuleFor(t => t.AuthorizedUserId, f => f.Random.Bool() ? f.Random.Int(0, 10) : (int?) null);
+
+        var transactions = transactionsFake.Generate(numberOfTransactions);
+
+        // Assign unique positive Id values for seed data
+        var currentMaxId = dbContext.Set<Transaction>().Max(t => (int?) t.Id) ?? 0;
+        var nextId = Math.Max(1, currentMaxId + 1);
+
+        foreach (var transaction in transactions) transaction.Id = nextId++;
+
+        return transactions;
     }
 }

@@ -1,11 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+using WAB.DAL.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<WabContext>(option =>
+{
+    option.EnableSensitiveDataLogging();
+    option.UseNpgsql(builder.Configuration.GetConnectionString("WalletDB"));
+});
+
 
 var app = builder.Build();
 

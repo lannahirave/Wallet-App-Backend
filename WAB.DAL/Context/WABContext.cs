@@ -14,5 +14,8 @@ public class WabContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Configure();
+        modelBuilder.SeedData();
     }
 }

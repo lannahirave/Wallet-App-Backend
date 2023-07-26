@@ -10,11 +10,13 @@ public class User
         get => _cardBalance;
         set
         {
-            if (value >= 1500) throw new ArgumentException("Card balance cannot exceed $1500");
+            if (value > 1500) throw new ArgumentException("Card balance cannot exceed $1500");
+            _cardBalance = value;
         }
     }
 
     public decimal DailyPoints { get; set; }
     public DateTime LastDailyPoints { get; set; }
-    public HashSet<Transaction> Transactions { get; set; } = new();
+    public ICollection<Transaction> Transactions { get; set; } = null!;
+    public ICollection<Transaction> AuthorizedTransactions { get; set; } = null!;
 }

@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="DTO\"/>
+        <ProjectReference Include="..\WAB.DAL\WAB.DAL.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="12.0.1"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4"/>
     </ItemGroup>
 
 </Project>
