@@ -31,4 +31,10 @@ public class TransactionRepository : ITransactionRepository
         return await _context.Transactions
             .Include(t => t.User).Include(t => t.AuthorizedUser).Where(x => x.UserId == userId).ToListAsync();
     }
+
+    public async Task<ICollection<Transaction>> GetLastNTransactionsByUserId(int userId, int n)
+    {
+        return await _context.Transactions
+            .Include(t => t.User).Include(t => t.AuthorizedUser).Where(x => x.UserId == userId).Take(n).ToListAsync();
+    }
 }

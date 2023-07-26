@@ -22,7 +22,10 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> Get(int id)
     {
-        return await _context.Users
+        var user = await _context.Users
             .Include(u => u.Transactions).FirstAsync(x => x.Id == id);
+        user.CalculateDailyPoints();
+        await _context.SaveChangesAsync();
+        return user;
     }
 }

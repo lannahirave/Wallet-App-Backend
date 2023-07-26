@@ -5,7 +5,7 @@ public class Transaction
 {
     // Constructor
     public Transaction(decimal amount, string name, string description, DateTime date, bool pending, string icon,
-        User authorizedUser, User? user)
+        User authorizedUser, User user)
     {
         Type = amount > 0 ? TransactionType.Payment : TransactionType.Credit;
         Amount = amount;
@@ -28,16 +28,16 @@ public class Transaction
     public int Id { get; set; }
     public TransactionType Type { get; set; }
     public decimal Amount { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
     public DateTime Date { get; set; }
     public bool Pending { get; set; }
 
     public int UserId { get; set; }
 
-    public User User { get; set; }
+    public User User { get; set; } = null!;
 
     public int? AuthorizedUserId { get; set; }
     public User? AuthorizedUser { get; set; }
-    public string Icon { get; set; } // Icon property to store the icon path or icon class reference
+    public string Icon { get; set; } = null!; // Icon property to store the icon path or icon class reference
 }

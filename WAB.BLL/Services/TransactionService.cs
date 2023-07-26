@@ -30,4 +30,10 @@ public class TransactionService : TransactionBaseService
         var transactions = await ((ITransactionRepository) Context).GetTransactionsByUserId(id);
         return Mapper.Map<ICollection<TransactionDtoRead>>(transactions);
     }
+
+    public override async Task<ICollection<TransactionDtoRead>> GetLastNTransactionsByUserId(int id, int n)
+    {
+        var transactions = await ((ITransactionRepository) Context).GetLastNTransactionsByUserId(id, n);
+        return Mapper.Map<ICollection<TransactionDtoRead>>(transactions);
+    }
 }

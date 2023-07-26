@@ -34,4 +34,11 @@ public class TransactionController : ControllerBase
         var transactions = await _transactionService.GetTransactionsByUserId(userId);
         return Ok(transactions);
     }
+
+    [HttpGet("{n}/user/{userId}")]
+    public async Task<IActionResult> GetTransactionsByUserId(int userId, int n)
+    {
+        var transactions = await _transactionService.GetLastNTransactionsByUserId(userId, n);
+        return Ok(transactions);
+    }
 }

@@ -22,4 +22,5 @@ public abstract class TransactionBaseService : BaseService<Transaction>
     // public abstract Task<UserDTORead> UpdateUser(UserDTORead user);
     //
     // public abstract Task DeleteUser(int id);
+    public abstract Task<ICollection<TransactionDtoRead>> GetLastNTransactionsByUserId(int id, int n);
 }

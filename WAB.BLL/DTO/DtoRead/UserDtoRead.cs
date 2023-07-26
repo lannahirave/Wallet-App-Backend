@@ -6,5 +6,4 @@ public class UserDtoRead
     public decimal CardBalance { get; set; }
     public decimal DailyPoints { get; set; }
     public DateTime LastDailyPoints { get; set; }
-    public List<TransactionDtoRead> Transactions { get; set; }
 }

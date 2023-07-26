@@ -84,7 +84,7 @@ public static class WabContextExtensions
         var users = new Faker<User>()
             .RuleFor(u => u.Id, f => f.IndexFaker - 1000) // Use negative values for User Ids
             .RuleFor(u => u.CardBalance, f => f.Random.Decimal(0, 1500))
-            .RuleFor(u => u.DailyPoints, f => f.Random.Decimal(0, 100))
+            .RuleFor(u => u.DailyPoints, f => Math.Round(f.Random.Double(0, 100), 2))
             .RuleFor(u => u.LastDailyPoints, f => f.Date.Past())
             .Generate(10);
 
@@ -102,7 +102,7 @@ public static class WabContextExtensions
             .RuleFor(t => t.Pending, f => f.Random.Bool())
             .RuleFor(t => t.Icon, f => f.Image.PicsumUrl())
             .RuleFor(t => t.UserId, f => f.PickRandom(users).Id) // Assign random UserId to each transaction
-            .Generate(20);
+            .Generate(400);
         // Assign random AuthorizedUserId to 30% of the transactions
         foreach (var transaction in transactions)
         {
